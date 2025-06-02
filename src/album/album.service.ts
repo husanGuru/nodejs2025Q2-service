@@ -2,9 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
+import { FavoritesService } from 'src/favorites/favorites.service';
+import { TrackService } from 'src/track/track.service';
 
 @Injectable()
 export class AlbumService {
+  constructor(
+    private readonly favoritesService: FavoritesService,
+    private readonly trackService: TrackService,
+  ) {}
+
   albums: Album[] = [];
 
   create(createAlbumDto: CreateAlbumDto) {
@@ -50,7 +57,19 @@ export class AlbumService {
     if (albumIndex === -1) {
       throw new NotFoundException(`Album with id ${id} doesn't exist`);
     }
+
+    if (this.favoritesService.favorites.albums.includes(id)) {
+      this.favoritesService.removeAlbum(id);
+    }
+
+    this.trackService.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
+
     this.albums.splice(albumIndex, 1);
+
     return `Album with id ${id} was deleted`;
   }
 }

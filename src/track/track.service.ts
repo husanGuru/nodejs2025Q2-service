@@ -2,9 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class TrackService {
+  constructor(private readonly favoritesService: FavoritesService) {}
+
   tracks: Track[] = [];
 
   create(createTrackDto: CreateTrackDto) {
@@ -51,6 +54,11 @@ export class TrackService {
     if (trackIndex === -1) {
       throw new NotFoundException(`Track with id ${id} doesn't exist`);
     }
+
+    if (this.favoritesService.favorites.tracks.includes(id)) {
+      this.favoritesService.removeTrack(id);
+    }
+
     this.tracks.splice(trackIndex, 1);
     return `Track with id ${id} was deleted`;
   }
