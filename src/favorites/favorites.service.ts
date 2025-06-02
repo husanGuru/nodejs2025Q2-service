@@ -3,7 +3,6 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { Favorite } from './entities/favorite.entity';
 
 import { ArtistService } from 'src/artist/artist.service';
@@ -69,14 +68,6 @@ export class FavoritesService {
         this.trackService.findOne(trackId),
       ),
     };
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
-  }
-
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
   }
 
   removeTrack(id: string) {
