@@ -1,19 +1,10 @@
 # Home Library Service
 
-## Prerequisites
-
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
-
-## Downloading
+## Downloading and installing
 
 ```
-git clone {repository URL}
-```
+git clone --branch dev --single-branch https://github.com/husanGuru/nodejs2025Q2-service.git .
 
-## Installing NPM modules
-
-```
 npm install
 ```
 
@@ -23,50 +14,214 @@ npm install
 npm start
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+The app starts on port 4000 by default (http://localhost:4000), can be modified in .env
 
-## Testing
 
-After application running open new terminal and enter:
 
-To run all tests without authorization
 
+## API Reference
+
+#### Users (/user)
+
+get all users
+```http
+  GET /user
 ```
-npm run test
+get user by id
+```http
+  GET /user/:id
 ```
-
-To run only one of all test suites
-
+create new user
+```http
+  POST /user
 ```
-npm run test -- <path to suite>
+| Body      | Type     | Description  |
+| :-------- | :------- | :------------|
+| `login`   | `string` | **Required** |
+| `password`| `string` | **Required** |
+
+update user
+```http
+  PATCH /user/:id
 ```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `string` | **Required** |
 
-To run all test with authorization
+| Body         | Type     | Description  |
+| :------------| :------- | :------------|
+| `oldPassword`| `string` | **Required** |
+| `newPassword`| `string` | **Required** |
 
+---
+#### Tracks (/track)
+
+get all tracks
+```http
+  GET /track
 ```
-npm run test:auth
+get track by id
+```http
+  GET /track/:id
 ```
-
-To run only specific test suite with authorization
-
+create new track
+```http
+  POST /track
 ```
-npm run test:auth -- <path to suite>
+| Body      | Type             | Description  |
+| :-------- | :--------------- | :------------|
+| `name`    | `string`         | **Required** |
+| `duration`| `number`         | **Required** |
+| `artistId`| `UUID4 \| null`  | Optional     |
+| `albumId` | `UUID4 \| null`  | Optional     |
+
+update track
+```http
+  PATCH /track/:id
 ```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `string` | **Required** |
 
-### Auto-fix and format
+| Body      | Type             | Description |
+| :---------| :--------------- | :-----------|
+| `name`    | `string`         | Optional    |
+| `duration`| `string`         | Optional    |
+| `artistId`| `UUID4 \| null`  | Optional    |
+| `albumId` | `UUID4 \| null`  | Optional    |
 
+delete track by id
+```http
+  DELETE /track/:id
 ```
-npm run lint
+---
+#### Artists (/artist)
+
+get all artists
+```http
+  GET /artist
 ```
-
+get artist by id
+```http
+  GET /artist/:id
 ```
-npm run format
+create new artist
+```http
+  POST /artist
 ```
+| Body      | Type             | Description  |
+| :-------- | :--------------- | :------------|
+| `name`    | `string`         | **Required** |
+| `grammy`  | `string`         | **Required** |
 
-### Debugging in VSCode
+update artist
+```http
+  PATCH /artist/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `string` | **Required** |
 
-Press <kbd>F5</kbd> to debug.
+| Body      | Type             | Description |
+| :---------| :--------------- | :-----------|
+| `name`    | `string`         | Optional    |
+| `grammy`  | `string`         | Optional    |
 
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+delete artist by id
+```http
+  DELETE /artist/:id
+```
+---
+#### Albums (/album)
+
+get all albums
+```http
+  GET /album
+```
+get album by id
+```http
+  GET /album/:id
+```
+create new album
+```http
+  POST /album
+```
+| Body      | Type             | Description  |
+| :-------- | :--------------- | :------------|
+| `name`    | `string`         | **Required** |
+| `year`    | `number`         | **Required** |
+| `artistId`| `UUID4 \| null`  | Optional     |
+
+update album
+```http
+  PATCH /album/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `string` | **Required** |
+
+| Body      | Type             | Description |
+| :---------| :--------------- | :-----------|
+| `name`    | `string`         | Optional    |
+| `year`    | `string`         | Optional    |
+| `artistId`| `UUID4 \| null`  | Optional    |
+
+delete album by id
+```http
+  DELETE /album/:id
+```
+---
+#### Favorites (/favs)
+
+get all favorites
+```http
+  GET /favs
+```
+add track to favorites
+```http
+  POST /favs/track/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of track |
+
+add album to favorites
+```http
+  POST /favs/album/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of album |
+
+add artist to favorites
+```http
+  POST /favs/artist/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of artist |
+
+remove track from favorites
+```http
+  DELETE /favs/track/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of track |
+
+remove album from favorites
+```http
+  DELETE /favs/album/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of album |
+
+remove artist from favorites
+```http
+  DELETE /favs/artist/:id
+```
+| Parameter | Type     | Description  |
+| :-------- | :------- | :------------|
+| `id`      | `UUID4`  | **Required**id of artist |
+
