@@ -16,8 +16,8 @@ export class UserService {
     const user = new User({
       id: crypto.randomUUID(),
       version: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
       login: createUserDto.login,
       password: createUserDto.password,
     });
@@ -50,6 +50,8 @@ export class UserService {
       throw new ForbiddenException(`Old password is wrong`);
     }
     this.users[userIndex].password = updateUserDto.newPassword;
+    this.users[userIndex].version++;
+    this.users[userIndex].updatedAt = new Date().getTime();
 
     return omit(this.users[userIndex], ['password']);
   }

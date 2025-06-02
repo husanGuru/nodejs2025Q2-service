@@ -24,7 +24,7 @@ export class FavoritesService {
   };
 
   addTrack(id: string) {
-    const track = this.trackService.findOne(id);
+    const track = this.trackService.tracks.find((t) => t.id === id);
     if (!track) {
       throw new UnprocessableEntityException(
         `Track with id ${id} doesn't exist`,
@@ -35,7 +35,7 @@ export class FavoritesService {
   }
 
   addAlbum(id: string) {
-    const album = this.albumService.findOne(id);
+    const album = this.albumService.albums.find((a) => a.id === id);
     if (!album) {
       throw new UnprocessableEntityException(
         `Album with id ${id} doesn't exist`,
@@ -46,7 +46,7 @@ export class FavoritesService {
   }
 
   addArtist(id: string) {
-    const artist = this.artistService.findOne(id);
+    const artist = this.artistService.artists.find((a) => a.id === id);
     if (!artist) {
       throw new UnprocessableEntityException(
         `Artist with id ${id} doesn't exist`,

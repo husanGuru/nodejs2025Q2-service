@@ -42,7 +42,7 @@ create new user
 
 update user
 ```http
-  PATCH /user/:id
+  PUT /user/:id
 ```
 | Parameter | Type     | Description  |
 | :-------- | :------- | :------------|
@@ -77,7 +77,7 @@ create new track
 
 update track
 ```http
-  PATCH /track/:id
+  PUT /track/:id
 ```
 | Parameter | Type     | Description  |
 | :-------- | :------- | :------------|
@@ -116,7 +116,7 @@ create new artist
 
 update artist
 ```http
-  PATCH /artist/:id
+  PUT /artist/:id
 ```
 | Parameter | Type     | Description  |
 | :-------- | :------- | :------------|
@@ -154,7 +154,7 @@ create new album
 
 update album
 ```http
-  PATCH /album/:id
+  PUT /album/:id
 ```
 | Parameter | Type     | Description  |
 | :-------- | :------- | :------------|

@@ -44,7 +44,7 @@ export class AlbumService {
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const albumIndex = this.albums.findIndex((u) => u.id === id);
+    const albumIndex = this.albums.findIndex((a) => a.id === id);
 
     if (albumIndex === -1) {
       throw new NotFoundException(`Album with id ${id} doesn't exist`);
@@ -75,7 +75,5 @@ export class AlbumService {
     });
 
     this.albums.splice(albumIndex, 1);
-
-    return `Album with id ${id} was deleted`;
   }
 }

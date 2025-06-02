@@ -81,6 +81,5 @@ export class ArtistService {
     });
 
     this.artists.splice(artistIndex, 1);
-    return `Artist with id ${id} was deleted`;
   }
 }
