@@ -8,6 +8,10 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY . ./
+COPY . .
 
-CMD [ "npm", "run", "start:dev" ]
+RUN npx prisma generate
+
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh

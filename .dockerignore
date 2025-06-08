@@ -22,3 +22,6 @@ coverage
 # Docker
 Dockerfile
 docker-compose.yml
+
+# Prisma
+/generated/prisma
