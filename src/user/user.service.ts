@@ -3,66 +3,120 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { DatabaseService } from 'src/database/database.service';
+import { Prisma } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { omit } from 'src/utils/omit';
 
 @Injectable()
 export class UserService {
-  users: User[] = [];
+  constructor(private prisma: DatabaseService) {}
 
-  create(createUserDto: CreateUserDto) {
-    const user = new User({
-      id: crypto.randomUUID(),
-      version: 1,
-      createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
-      login: createUserDto.login,
-      password: createUserDto.password,
+  async create(createUserDto: Prisma.UserCreateInput) {
+    const user = await this.prisma.user.create({
+      data: createUserDto,
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
-    this.users.push(user);
 
-    return omit(user, ['password']);
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 
   findAll() {
-    return this.users.map((user) => omit(user, ['password']));
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
-  findOne(id: string) {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
     if (!user) {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
 
-    return omit(user, ['password']);
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    const userIndex = this.users.findIndex((u) => u.id === id);
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        password: true,
+      },
+    });
 
-    if (userIndex === -1) {
+    if (!user) {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
 
-    if (this.users[userIndex].password !== updateUserDto.oldPassword) {
+    if (user.password !== updateUserDto.oldPassword) {
       throw new ForbiddenException(`Old password is wrong`);
     }
-    this.users[userIndex].password = updateUserDto.newPassword;
-    this.users[userIndex].version++;
-    this.users[userIndex].updatedAt = new Date().getTime();
 
-    return omit(this.users[userIndex], ['password']);
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: { password: updateUserDto.newPassword, version: { increment: 1 } },
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      ...updatedUser,
+      createdAt: new Date(updatedUser.createdAt).getTime(),
+      updatedAt: new Date(updatedUser.updatedAt).getTime(),
+    };
   }
 
-  remove(id: string) {
-    const userIndex = this.users.findIndex((u) => u.id === id);
+  async remove(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
 
-    if (userIndex === -1) {
+    if (!user) {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
-    this.users.splice(userIndex, 1);
+    await this.prisma.user.delete({ where: { id: id } });
 
     return `User with id ${id} was deleted`;
   }

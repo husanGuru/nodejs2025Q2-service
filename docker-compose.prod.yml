@@ -1,0 +1,45 @@
+services:
+  app:
+    build: ./
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - '4000:4000'
+    networks:
+      - nest-app-network
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    command: ['/bin/sh', '/entrypoint.sh']
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    networks:
+      - nest-app-network
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - nest-app-network
+
+networks:
+  nest-app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

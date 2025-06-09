@@ -10,6 +10,8 @@ import { Artist } from './entities/artist.entity';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { TrackService } from 'src/track/track.service';
 import { AlbumService } from 'src/album/album.service';
+import { DatabaseService } from 'src/database/database.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArtistService {
@@ -18,68 +20,64 @@ export class ArtistService {
     private readonly favoritesService: FavoritesService,
     private readonly trackService: TrackService,
     private readonly albumService: AlbumService,
+    private prisma: DatabaseService,
   ) {}
 
-  artists: Artist[] = [];
-
-  create(createArtistDto: CreateArtistDto) {
-    const artist = new Artist({
-      id: crypto.randomUUID(),
-      name: createArtistDto.name,
-      grammy: createArtistDto.grammy,
+  create(createArtistDto: Prisma.ArtistCreateInput) {
+    return this.prisma.artist.create({
+      data: createArtistDto,
     });
-    this.artists.push(artist);
-    return artist;
   }
 
   findAll() {
-    return this.artists;
+    return this.prisma.artist.findMany();
   }
 
-  findOne(id: string) {
-    const artist = this.artists.find((u) => u.id === id);
+  async findOne(id: string) {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} doesn't exist`);
     }
+
     return artist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const artistIndex = this.artists.findIndex((u) => u.id === id);
+  async update(id: string, updateArtistDto: Prisma.ArtistUpdateInput) {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id: id,
+      },
+    });
 
-    if (artistIndex === -1) {
+    if (!artist) {
       throw new NotFoundException(`Artist with id ${id} doesn't exist`);
     }
 
-    this.artists[artistIndex] = {
-      ...this.artists[artistIndex],
-      ...updateArtistDto,
-    };
-    return this.artists[artistIndex];
+    return this.prisma.artist.update({
+      where: {
+        id,
+      },
+      data: { ...updateArtistDto },
+    });
   }
 
-  remove(id: string) {
-    const artistIndex = this.artists.findIndex((u) => u.id === id);
-
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} doesn't exist`);
-    }
-
-    if (this.favoritesService.favorites.artists.includes(id)) {
-      this.favoritesService.removeArtist(id);
-    }
-
-    this.trackService.tracks.forEach((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
-    });
-    this.albumService.albums.forEach((album) => {
-      if (album.artistId === id) {
-        album.artistId = null;
-      }
+  async remove(id: string) {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id: id,
+      },
     });
 
-    this.artists.splice(artistIndex, 1);
+    if (!artist) {
+      throw new NotFoundException(`Album with id ${id} doesn't exist`);
+    }
+    await this.prisma.artist.delete({ where: { id: id } });
+
+    return `Album with id ${id} was deleted`;
   }
 }
