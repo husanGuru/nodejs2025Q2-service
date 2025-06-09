@@ -1,6 +1,6 @@
 services:
   app:
-    build: ./
+    image: husandocker/nestjs-app
     restart: always
     depends_on:
       - postgres
