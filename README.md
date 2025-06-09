@@ -8,18 +8,22 @@ git clone --branch docker --single-branch https://github.com/husanGuru/nodejs202
 docker compose up -d
 ```
 
-App is available on host port :4000 by default.
+App is available on host port 4000: http://localhost:4000
 
-Postgres db is available on host port :5432 by default.
-
-Adminer (database client) is available on host port :8080 by default.
-
-## Running application
+- changes in /src folder triggers hot reload
+- to run tests need to install packages (jest)
 
 ```
-npm start
+npm install
+npm run test
 ```
 
-The app starts on port 4000 by default (http://localhost:4000), can be modified in .env
+Adminer (database client) is available on host port 8080: http://localhost:8080
 
+- system: PostgreSQL
+- server: postgres
+- username: postgres_user
+- password: password
+- database: nest_db
 
+Postgres db is available on host port :5432.
