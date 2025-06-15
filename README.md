@@ -9,10 +9,8 @@ docker compose up -d
 ```
 
 App is available on host port 4000: http://localhost:4000
-
 - changes in /src folder triggers hot reload
 - to run tests need to install packages (jest)
-
 ```
 npm install
 npm run test
@@ -27,3 +25,8 @@ Adminer (database client) is available on host port 8080: http://localhost:8080
 - database: nest_db
 
 Postgres db is available on host port :5432.
+
+npm script for vulnerabilities scanning (scans `husandocker/nestjs-app` image)
+```
+npm run scan
+```
