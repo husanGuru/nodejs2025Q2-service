@@ -1,72 +1,32 @@
-# Home Library Service
+# REST service: Containerization and Database (PostgreSQL) & ORM
 
-## Prerequisites
-
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
-
-## Downloading
+## Downloading and installing
 
 ```
-git clone {repository URL}
+git clone --branch docker --single-branch https://github.com/husanGuru/nodejs2025Q2-service.git .
+
+docker compose up -d
 ```
 
-## Installing NPM modules
-
+App is available on host port 4000: http://localhost:4000
+- changes in /src folder triggers hot reload
+- to run tests need to install packages (jest)
 ```
 npm install
-```
-
-## Running application
-
-```
-npm start
-```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
-
-## Testing
-
-After application running open new terminal and enter:
-
-To run all tests without authorization
-
-```
 npm run test
 ```
 
-To run only one of all test suites
+Adminer (database client) is available on host port 8080: http://localhost:8080
 
+- system: PostgreSQL
+- server: postgres
+- username: postgres_user
+- password: password
+- database: nest_db
+
+Postgres db is available on host port :5432.
+
+npm script for vulnerabilities scanning (scans `husandocker/nestjs-app` image)
 ```
-npm run test -- <path to suite>
+npm run scan
 ```
-
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
-```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging

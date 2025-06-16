@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid(4))
+  login        String        @unique
+  password     String
+  version      Int           @default(1)
+  Favorite     Favorite[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  refreshToken RefreshToken?
+}
+
+model Album {
+  id   String @id @default(uuid(4))
+  name String
+  year Int
+
+  artist   Artist? @relation(fields: [artistId], references: [id])
+  artistId String?
+
+  Track          Track[]
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
+}
+
+model Artist {
+  id             String    @id @default(uuid(4))
+  name           String
+  grammy         Boolean
+  Album          Album[]
+  Track          Track[]
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
+}
+
+model Track {
+  id       String  @id @default(uuid(4))
+  name     String
+  duration Int
+  artist   Artist? @relation(fields: [artistId], references: [id])
+  artistId String?
+
+  album          Album?    @relation(fields: [albumId], references: [id])
+  albumId        String?
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
+}
+
+model Favorite {
+  id Int @id @default(autoincrement())
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  artists Artist[]
+
+  albums Album[]
+
+  tracks Track[]
+}
+
+model RefreshToken {
+  id Int @id @default(autoincrement())
+
+  token String @unique
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  expiryDate DateTime
+}
