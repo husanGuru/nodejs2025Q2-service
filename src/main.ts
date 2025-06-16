@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AllExceptionsFilter } from './utils/filters/exceptions.filter';
 import { MyLogger } from './logger/logger.service';
 
 async function bootstrap() {
@@ -20,7 +21,19 @@ async function bootstrap() {
     }),
   );
 
-  app.useLogger(app.get(MyLogger));
+  const logger = app.get(MyLogger);
+
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
+
+  process.on('uncaughtException', (error: Error) => {
+    logger.error('Uncaught Exception', error.stack || error.message, 'Process');
+  });
+
+  process.on('unhandledRejection', (reason: unknown) => {
+    const message =
+      reason instanceof Error ? reason.stack || reason.message : String(reason);
+    logger.error('Unhandled Promise Rejection', message, 'Process');
+  });
 
   await app.listen(port);
 }
