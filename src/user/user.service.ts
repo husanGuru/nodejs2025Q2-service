@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -16,20 +15,8 @@ export class UserService {
   constructor(private prisma: DatabaseService) {}
 
   async create(createUserDto: Prisma.UserCreateInput) {
-    const existingUser = await this.prisma.user.findFirst({
+    let user = await this.prisma.user.findFirst({
       where: { login: createUserDto.login },
-    });
-
-    if (existingUser) {
-      throw new ConflictException('User with this login already exists');
-    }
-
-    const salt = await bcrypt.genSalt(jwtConstants.salt);
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-
-    const user = await this.prisma.user.create({
-      data: { ...createUserDto, password: hashedPassword },
       select: {
         id: true,
         login: true,
@@ -38,6 +25,23 @@ export class UserService {
         updatedAt: true,
       },
     });
+
+    if (!user) {
+      const salt = await bcrypt.genSalt(jwtConstants.salt);
+
+      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+
+      user = await this.prisma.user.create({
+        data: { ...createUserDto, password: hashedPassword },
+        select: {
+          id: true,
+          login: true,
+          version: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    }
 
     return {
       ...user,
@@ -97,7 +101,12 @@ export class UserService {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
 
-    if (user.password !== updateUserDto.oldPassword) {
+    const isValidPassword = await bcrypt.compare(
+      updateUserDto.oldPassword,
+      user.password,
+    );
+
+    if (!isValidPassword) {
       throw new ForbiddenException(`Old password is wrong`);
     }
 
