@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllExceptionsFilter } from './utils/filters/exceptions.filter';
+import { HttpExceptionFilter } from './utils/filters/exceptions.filter';
 import { MyLogger } from './logger/logger.service';
 
 async function bootstrap() {
@@ -13,6 +13,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 4000;
 
+  const logger = app.get(MyLogger);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -21,9 +23,7 @@ async function bootstrap() {
     }),
   );
 
-  const logger = app.get(MyLogger);
-
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  app.useGlobalFilters(new HttpExceptionFilter(logger));
 
   process.on('uncaughtException', (error: Error) => {
     logger.error('Uncaught Exception', error.stack || error.message, 'Process');

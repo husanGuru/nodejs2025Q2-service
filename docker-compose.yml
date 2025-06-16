@@ -12,6 +12,7 @@ services:
       - nest-app-network
     volumes:
       - ./src:/app/src
+      - logs:/app/logs
       - /app/node_modules
     command: ['/bin/sh', '/entrypoint.sh']
 
@@ -43,3 +44,4 @@ networks:
 
 volumes:
   postgres-data:
+  logs:

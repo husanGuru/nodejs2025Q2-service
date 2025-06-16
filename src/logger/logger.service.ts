@@ -1,5 +1,5 @@
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import { LoggerService, Injectable } from '@nestjs/common';
 import { createStream } from 'rotating-file-stream';
 

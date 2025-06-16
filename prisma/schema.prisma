@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid(4))
-  login     String
-  password  String
-  version   Int        @default(1)
-  Favorite  Favorite[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id           String         @id @default(uuid(4))
+  login        String         @unique
+  password     String
+  version      Int            @default(1)
+  Favorite     Favorite[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  RefreshToken RefreshToken[]
 }
 
 model Album {
@@ -31,19 +32,21 @@ model Album {
   artist   Artist? @relation(fields: [artistId], references: [id])
   artistId String?
 
-  Track      Track[]
-  Favorite   Favorite? @relation(fields: [favoriteId], references: [id])
-  favoriteId Int?
+  Track          Track[]
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
 }
 
 model Artist {
-  id         String    @id @default(uuid(4))
-  name       String
-  grammy     Boolean
-  Album      Album[]
-  Track      Track[]
-  Favorite   Favorite? @relation(fields: [favoriteId], references: [id])
-  favoriteId Int?
+  id             String    @id @default(uuid(4))
+  name           String
+  grammy         Boolean
+  Album          Album[]
+  Track          Track[]
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
 }
 
 model Track {
@@ -53,10 +56,11 @@ model Track {
   artist   Artist? @relation(fields: [artistId], references: [id])
   artistId String?
 
-  album      Album?    @relation(fields: [albumId], references: [id])
-  albumId    String?
-  Favorite   Favorite? @relation(fields: [favoriteId], references: [id])
-  favoriteId Int?
+  album          Album?    @relation(fields: [albumId], references: [id])
+  albumId        String?
+  Favorite       Favorite? @relation(fields: [favoriteId], references: [id])
+  favoriteId     Int?
+  refreshTokenId Int?
 }
 
 model Favorite {
@@ -70,4 +74,15 @@ model Favorite {
   albums Album[]
 
   tracks Track[]
+}
+
+model RefreshToken {
+  id Int @id @default(autoincrement())
+
+  token String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  expiryDate DateTime
 }

@@ -3,43 +3,40 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
-  HttpStatus,
+  InternalServerErrorException,
+  BadGatewayException,
+  GatewayTimeoutException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { MyLogger } from '../../logger/logger.service';
 
-@Catch()
-export class AllExceptionsFilter implements ExceptionFilter {
+@Catch(
+  InternalServerErrorException,
+  BadGatewayException,
+  GatewayTimeoutException,
+)
+export class HttpExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: MyLogger) {}
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    console.log(1);
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-
-    const isHttpException = exception instanceof HttpException;
-
-    const status = isHttpException
-      ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    const message = isHttpException
-      ? exception.message
-      : 'Internal server error';
-
-    const errorResponse = {
-      statusCode: status,
-      message,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-    };
+    const status = exception.getStatus();
 
     this.logger.error(
-      `Unhandled error on ${request.method} ${request.url}`,
-      (exception as any)?.stack || String(exception),
+      `Error on ${request.method} ${request.url}`,
+      (exception as any)?.stack || '',
       'ExceptionFilter',
     );
 
-    response.status(status).json(errorResponse);
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: 'Internal server error',
+    });
   }
 }
